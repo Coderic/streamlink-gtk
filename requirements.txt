@@ -1,0 +1,2 @@
+# PyPI stack for local development (GTK/GI still comes from the system).
+streamlink==8.3.0

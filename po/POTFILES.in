@@ -1,0 +1,8 @@
+# List of source files containing translatable strings.
+# Please keep this file sorted alphabetically.
+data/org.coderic.streamlinkgtk.desktop.in
+data/org.coderic.streamlinkgtk.metainfo.xml.in
+data/org.coderic.streamlinkgtk.gschema.xml
+src/streamlink_gtk/main.py
+src/streamlink_gtk/window.py
+src/streamlink_gtk/window.ui

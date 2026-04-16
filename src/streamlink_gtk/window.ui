@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <template class="StreamlinkGtkWindow" parent="GtkApplicationWindow">
+    <property name="title" translatable="yes">StreamlinkGTK</property>
+    <property name="default-width">960</property>
+    <property name="default-height">640</property>
+    <property name="titlebar">
+      <object class="GtkHeaderBar">
+        <child type="end">
+          <object class="GtkMenuButton">
+            <property name="primary">True</property>
+            <property name="icon-name">open-menu-symbolic</property>
+            <property name="tooltip-text" translatable="yes">Main Menu</property>
+            <property name="menu-model">primary_menu</property>
+          </object>
+        </child>
+      </object>
+    </property>
+    <property name="child">
+      <object class="GtkBox">
+        <property name="orientation">vertical</property>
+        <property name="spacing">8</property>
+        <property name="margin-start">12</property>
+        <property name="margin-end">12</property>
+        <property name="margin-top">12</property>
+        <property name="margin-bottom">12</property>
+        <child>
+          <object class="GtkBox" id="toolbar_box">
+            <property name="spacing">8</property>
+            <property name="hexpand">True</property>
+            <child>
+              <object class="GtkEntry" id="url_entry">
+                <property name="hexpand">True</property>
+                <property name="placeholder-text" translatable="yes">Paste stream URL…</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="add_button">
+                <property name="label" translatable="yes">Add _Queue</property>
+                <property name="use-underline">True</property>
+                <signal name="clicked" handler="on_add_clicked"/>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel">
+                <property name="label" translatable="yes">Default quality</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkEntry" id="default_quality_entry">
+                <property name="width-chars">10</property>
+                <property name="placeholder-text">best</property>
+                <property name="tooltip-text" translatable="yes">Stream key (e.g. best, 720p)</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="stop_all_button">
+                <property name="label" translatable="yes">Stop _All</property>
+                <property name="use-underline">True</property>
+                <signal name="clicked" handler="on_stop_all_clicked"/>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkScrolledWindow" id="jobs_viewport">
+            <property name="hexpand">True</property>
+            <property name="vexpand">True</property>
+            <property name="has-frame">True</property>
+            <property name="propagate-natural-height">False</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkRevealer" id="recording_log_revealer">
+            <property name="reveal-child">True</property>
+            <child>
+              <object class="GtkBox">
+                <property name="orientation">vertical</property>
+                <property name="spacing">6</property>
+                <child>
+                  <object class="GtkLabel" id="recording_log_title">
+                    <property name="xalign">0.0</property>
+                    <property name="label" translatable="yes">Streamlink activity</property>
+                    <style>
+                      <class name="heading"/>
+                    </style>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkScrolledWindow" id="recording_log_scrolled">
+                    <property name="hexpand">True</property>
+                    <property name="vexpand">False</property>
+                    <property name="min-content-height">140</property>
+                    <property name="max-content-height">220</property>
+                    <property name="has-frame">True</property>
+                    <child>
+                      <object class="GtkTextView" id="recording_log_view">
+                        <property name="editable">False</property>
+                        <property name="cursor-visible">False</property>
+                        <property name="wrap-mode">word-char</property>
+                        <property name="left-margin">8</property>
+                        <property name="right-margin">8</property>
+                        <property name="top-margin">8</property>
+                        <property name="bottom-margin">8</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <!-- Selectable label: copy long errors (e.g. Streamlink); GtkStatusbar text is not selectable -->
+          <object class="GtkLabel" id="status_message">
+            <property name="xalign">0.0</property>
+            <property name="hexpand">True</property>
+            <property name="selectable">True</property>
+            <property name="wrap">True</property>
+            <property name="wrap-mode">word-char</property>
+            <property name="use-markup">False</property>
+            <style>
+              <class name="dim-label"/>
+            </style>
+          </object>
+        </child>
+      </object>
+    </property>
+  </template>
+  <menu id="primary_menu">
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">_Preferences</attribute>
+        <attribute name="action">app.preferences</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">_Keyboard Shortcuts</attribute>
+        <attribute name="action">win.show-help-overlay</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">_About StreamlinkGTK</attribute>
+        <attribute name="action">app.about</attribute>
+      </item>
+    </section>
+  </menu>
+</interface>

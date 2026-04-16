@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="streamlink-gtk">
+	<schema id="org.coderic.streamlinkgtk" path="/org/coderic/streamlinkgtk/">
+		<key name="player-command" type="s">
+			<default>'mpv'</default>
+			<summary>External player command</summary>
+			<description>Executable and optional flags. Use %u where the stream URL should appear; if omitted, the URL is appended.</description>
+		</key>
+		<key name="default-stream-quality" type="s">
+			<default>'best'</default>
+			<summary>Preferred stream key when available</summary>
+		</key>
+		<key name="record-output-dir" type="s">
+			<default>''</default>
+			<summary>Recording output directory</summary>
+			<description>Empty uses the XDG Videos directory. Recording files are created here.</description>
+		</key>
+		<key name="record-filename-template" type="s">
+			<default>'streamlink-gtk-{job}-{time}.{ext}'</default>
+			<summary>Recording filename template</summary>
+			<description>Basename only (no path). Placeholders: {job} (short id), {time} (YYYYMMDD-HHMMSS), {ext} (extension from recording container).</description>
+		</key>
+		<key name="record-container" type="s">
+			<default>'mkv'</default>
+			<summary>Recording container (FFmpeg muxer)</summary>
+			<description>Used for --ffmpeg-fout and for the {ext} placeholder. Values: mkv (Matroska), mp4, mpegts. Must match Streamlink muxing; see Streamlink --ffmpeg-fout.</description>
+		</key>
+	</schema>
+</schemalist>

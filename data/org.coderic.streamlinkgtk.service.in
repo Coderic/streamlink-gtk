@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=org.coderic.streamlinkgtk
+Exec=@bindir@/streamlink-gtk --gapplication-service

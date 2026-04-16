@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=StreamlinkGTK
+Exec=streamlink-gtk
+Icon=org.coderic.streamlinkgtk
+Terminal=false
+Type=Application
+Categories=Utility;AudioVideo;
+Keywords=GTK;Streamlink;
+StartupNotify=true
+DBusActivatable=true
