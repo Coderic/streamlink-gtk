@@ -1,0 +1,6 @@
+option(
+  'python',
+  type: 'string',
+  value: 'python3',
+  description: 'Python executable (name or path) for the launcher script and installed modules',
+)

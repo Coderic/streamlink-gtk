@@ -1,0 +1,146 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  flatpak:
+    name: Flatpak bundle
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Flatpak
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder
+
+      - name: Set up Flathub
+        run: |
+          flatpak remote-add --if-not-exists flathub \
+            https://flathub.org/repo/flathub.flatpakrepo
+
+      - name: Cache Flatpak builder
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.local/share/flatpak
+            ~/.flatpak-builder
+          key: flatpak-${{ hashFiles('org.coderic.streamlinkgtk.json', 'requirements.txt', 'tools/fetch-pypi-wheels.sh') }}
+          restore-keys: |
+            flatpak-
+
+      - name: Install GNOME 50 runtime
+        run: |
+          flatpak install -y flathub org.gnome.Platform//50 org.gnome.Sdk//50
+
+      - name: Fetch PyPI wheels (Flatpak SDK Python)
+        run: ./tools/fetch-pypi-wheels.sh
+
+      - name: Build Flatpak
+        run: |
+          flatpak-builder --user \
+            --install-deps-from=flathub \
+            --repo=repo \
+            --force-clean \
+            flatpak-app \
+            org.coderic.streamlinkgtk.json
+
+      - name: Create .flatpak bundle
+        run: |
+          flatpak build-bundle repo \
+            "streamlink-gtk-${GITHUB_REF_NAME}.flatpak" \
+            org.coderic.streamlinkgtk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: flatpak-bundle
+          path: '*.flatpak'
+
+  windows:
+    name: Windows (MSYS2 UCRT64) zip
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            git
+            rsync
+            zip
+            mingw-w64-ucrt-x86_64-meson
+            mingw-w64-ucrt-x86_64-ninja
+            mingw-w64-ucrt-x86_64-gtk4
+            mingw-w64-ucrt-x86_64-gobject-introspection
+            mingw-w64-ucrt-x86_64-python
+            mingw-w64-ucrt-x86_64-python-pip
+            mingw-w64-ucrt-x86_64-python-gobject
+            mingw-w64-ucrt-x86_64-pkgconf
+            mingw-w64-ucrt-x86_64-ffmpeg
+            mingw-w64-ucrt-x86_64-gettext-tools
+            mingw-w64-ucrt-x86_64-glib2
+
+      - name: Build, install, package
+        env:
+          MINGW_PREFIX: /ucrt64
+        run: |
+          set -euo pipefail
+          cd "${GITHUB_WORKSPACE}"
+          python3 -m pip install -r requirements.txt
+          meson setup build --prefix="${MINGW_PREFIX}" -Dpython=python3
+          meson compile -C build
+          rm -rf staging
+          DESTDIR="$(pwd)/staging" meson install -C build
+          bash ./tools/package-msys2-portable.sh \
+            "$(pwd)/staging" \
+            "$(pwd)/streamlink-gtk-${GITHUB_REF_NAME}-windows-x86_64.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-zip
+          path: streamlink-gtk-*-windows-x86_64.zip
+
+  release:
+    name: Publish GitHub Release
+    needs: [flatpak, windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: flatpak-bundle
+          path: assets
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-zip
+          path: assets
+
+      - name: Source tarball
+        run: |
+          git archive --format=tar.gz \
+            --prefix="streamlink-gtk-${GITHUB_REF_NAME}/" \
+            -o "assets/streamlink-gtk-${GITHUB_REF_NAME}.tar.gz" \
+            HEAD
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: StreamlinkGTK ${{ github.ref_name }}
+          generate_release_notes: true
+          files: assets/*

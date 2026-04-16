@@ -10,7 +10,11 @@ Aplicación GTK 4 (**streamlink-gtk**) que actúa como gestor de colas para **St
 
 ### Intérprete y Streamlink
 
-El proyecto usa el Python del sistema con PyGObject (p. ej. `/usr/bin/python3` en Fedora). Meson está configurado para preferir ese intérprete para el lanzador `streamlink-gtk`.
+El intérprete por defecto es el que resuelva Meson (`python3` en el `PATH`). Para empaquetado con el Python del sistema explícito (p. ej. Fedora):
+
+```bash
+meson setup build -Dpython=/usr/bin/python3
+```
 
 Instala Streamlink para ese intérprete, por ejemplo:
 
@@ -80,6 +84,48 @@ En `flatpak-builder`, un source `type: dir` copia **el contenido** de esa carpet
 Desarrollo sin Flatpak sigue siendo `pip install -r requirements.txt` en el host (sección anterior).
 
 Permisos relevantes en el manifiesto: `--talk-name=org.freedesktop.Flatpak` y bus de sesión para lanzar el reproductor en el **host**.
+
+## Windows (MSYS2 UCRT64)
+
+En un entorno [MSYS2](https://www.msys2.org/) **UCRT64**, instala las dependencias de desarrollo (GTK 4, Python, PyGObject, Meson, gettext, FFmpeg, etc.), luego:
+
+```bash
+python3 -m pip install -r requirements.txt
+meson setup build --prefix=/ucrt64 -Dpython=python3
+meson compile -C build
+DESTDIR="$(pwd)/staging" meson install -C build
+./tools/package-msys2-portable.sh "$(pwd)/staging" "$(pwd)/streamlink-gtk-windows-x86_64.zip"
+```
+
+El script fusiona la biblioteca estándar de Python del prefijo MinGW, copia `ffmpeg.exe`, cierra dependencias DLL en `bin/` y genera un zip con `README-WINDOWS.txt` y `COPYING`.
+
+## Releases y CI
+
+Al publicar un tag **semver** (`X.Y.Z`, sin prefijo `v`), el workflow [.github/workflows/release.yml](.github/workflows/release.yml):
+
+1. Construye un **bundle Flatpak** (`.flatpak`) en Ubuntu tras ejecutar `./tools/fetch-pypi-wheels.sh` y `flatpak-builder`.
+2. Construye un **zip para Windows** (MSYS2 UCRT64) con el script anterior.
+3. Genera un **tar.gz del código** con `git archive`.
+4. Sube los tres artefactos al [GitHub Release](https://github.com/Coderic/streamlink-gtk/releases) asociado al tag (`softprops/action-gh-release`).
+
+La caché de Actions reduce tiempo en reconstrucciones cuando no cambian el manifiesto Flatpak ni `requirements.txt`.
+
+### Publicar la versión 0.0.1
+
+Con el workflow ya en la rama por defecto del remoto:
+
+```bash
+git tag -a 0.0.1 -m "StreamlinkGTK 0.0.1"
+git push origin 0.0.1
+```
+
+Opcional: crear o ajustar la nota de release con la CLI:
+
+```bash
+gh release create 0.0.1 --verify-tag --generate-notes
+```
+
+(Si el workflow ya adjunta notas, basta con revisar la pestaña Releases.)
 
 ## Documentación Streamlink
 

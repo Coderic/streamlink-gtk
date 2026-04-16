@@ -10,9 +10,7 @@ gnome.compile_resources('streamlinkgtk',
 )
 
 python_mod = import('python')
-# Prefer the system interpreter so the launcher matches PyGObject/GTK (not a bare venv on PATH).
-python_exe = find_program('/usr/bin/python3', 'python3', required: true)
-python_install = python_mod.find_installation(python_exe.full_path())
+python_install = python_mod.find_installation(get_option('python'))
 
 conf = configuration_data()
 conf.set('PYTHON', python_install.full_path())
