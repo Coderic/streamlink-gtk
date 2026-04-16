@@ -87,7 +87,7 @@ Permisos relevantes en el manifiesto: `--talk-name=org.freedesktop.Flatpak` y bu
 
 ## Windows (MSYS2 UCRT64)
 
-En un entorno [MSYS2](https://www.msys2.org/) **UCRT64**, instala las dependencias de desarrollo (GTK 4, Python, PyGObject, Meson, gettext, FFmpeg, etc.), luego:
+En un entorno [MSYS2](https://www.msys2.org/) **UCRT64**, instala las dependencias de desarrollo (GTK 4, Python, PyGObject, Meson, gettext, FFmpeg, etc.). Para **Streamlink** conviene instalar también las extensiones que de otro modo compilaría `pip` (p. ej. `mingw-w64-ucrt-x86_64-python-cffi` y `mingw-w64-ucrt-x86_64-python-lxml`), luego:
 
 ```bash
 python3 -m pip install -r requirements.txt

@@ -88,6 +88,8 @@ jobs:
             mingw-w64-ucrt-x86_64-python
             mingw-w64-ucrt-x86_64-python-pip
             mingw-w64-ucrt-x86_64-python-gobject
+            mingw-w64-ucrt-x86_64-python-cffi
+            mingw-w64-ucrt-x86_64-python-lxml
             mingw-w64-ucrt-x86_64-pkgconf
             mingw-w64-ucrt-x86_64-ffmpeg
             mingw-w64-ucrt-x86_64-gettext-tools
@@ -103,7 +105,8 @@ jobs:
           cd "${GITHUB_WORKSPACE}"
           export CC=gcc
           export CXX=g++
-          python3 -m pip install --break-system-packages -r requirements.txt
+          python3 -m pip install --break-system-packages --upgrade pip setuptools wheel
+          python3 -m pip install --break-system-packages --prefer-binary -r requirements.txt
           meson setup build --prefix="${MINGW_PREFIX}" -Dpython=python3
           meson compile -C build
           rm -rf staging
